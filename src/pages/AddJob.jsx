@@ -1,9 +1,49 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { AuthContext } from '../providers/AuthProvider'
 
 const AddJob = () => {
   const [startDate, setStartDate] = useState(new Date())
+
+  const {user} = useContext(AuthContext);
+  console.log(user.email)
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const title = form.get('job_title');
+    const email = form.get('email');
+    const category = form.get('category');
+    const minPrice = form.get('min_price');
+    const maxPrice = form.get('max_price');
+    const description = form.get('description');
+
+    const min_price = parseFloat(minPrice);
+    const max_price = parseFloat(maxPrice);
+
+    console.log(email)
+    const formData = { 
+      buyer:{
+        email,
+        name:user?.displayName,
+        photo:user?.photoURL,
+
+
+      },
+      title, 
+      email, 
+      category, 
+      min_price, 
+      max_price, 
+      description 
+    }
+    console.log(formData)
+
+
+
+  }
 
   return (
     <div className='flex justify-center items-center min-h-[calc(100vh-306px)] my-12'>
@@ -12,7 +52,7 @@ const AddJob = () => {
           Post a Job
         </h2>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>
             <div>
               <label className='text-gray-700 ' htmlFor='job_title'>
@@ -34,6 +74,8 @@ const AddJob = () => {
                 id='emailAddress'
                 type='email'
                 name='email'
+                defaultValue={user?.email}
+                readOnly={true}
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
               />
             </div>
