@@ -1,18 +1,22 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { AuthContext } from '../providers/AuthProvider'
+import toast from 'react-hot-toast'
 
 const UpdateJob = () => {
   const [startDate, setStartDate] = useState(new Date())
   const [job, setJob] = useState({});
-  const {id} = useParams()
+  const { user } = useContext(AuthContext)
+  const navigate = useNavigate();
+  const { id } = useParams()
 
 
   useEffect(() => {
     fetchAll();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchAll = async () => {
@@ -20,7 +24,49 @@ const UpdateJob = () => {
     setJob(data)
   }
 
-  console.log(job)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const title = form.get('job_title');
+    const email = form.get('email');
+    const category = form.get('category');
+    const minPrice = form.get('min_price');
+    const maxPrice = form.get('max_price');
+    const description = form.get('description');
+
+    const min_price = parseFloat(minPrice);
+    const max_price = parseFloat(maxPrice);
+
+
+    const formData = {
+      buyer: {
+        email,
+        name: user?.displayName,
+        photo: user?.photoURL,
+      },
+      title,
+      category,
+      min_price,
+      max_price,
+      deadline: startDate,
+      description,
+      bid_count: job?.bid_count,
+    }
+    // console.log(formData)
+
+    // send data to db (make a post request); 
+    try {
+      const {data} =  await axios.put(`${import.meta.env.VITE_API_URL}/update-job/${id}`, formData)
+      toast.success('Data updated successfully');
+      navigate('/my-posted-jobs')
+      e.target.reset();
+      console.log(data)
+
+    } catch (err) {
+      toast.error(err.message);
+    }
+
+  }
 
   return (
     <div className='flex justify-center items-center min-h-[calc(100vh-306px)] my-12'>
@@ -29,7 +75,7 @@ const UpdateJob = () => {
           Update a Job
         </h2>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>
             <div>
               <label className='text-gray-700 ' htmlFor='job_title'>
@@ -52,8 +98,8 @@ const UpdateJob = () => {
                 id='emailAddress'
                 type='email'
                 name='email'
-                defaultValue={job?.buyer?.email}
-                disabled
+                defaultValue={user?.email}
+                readOnly
                 className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md  focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
               />
             </div>
@@ -73,7 +119,7 @@ const UpdateJob = () => {
               </label>
               <select
                 name='category'
-                value={job.category || " "}
+                defaultValue={job.category || " "}
                 id='category'
                 className='border p-2 rounded-md'
               >

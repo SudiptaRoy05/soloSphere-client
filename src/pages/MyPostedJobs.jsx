@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const MyPostedJobs = () => {
   const { user } = useContext(AuthContext);
   const [jobs, setJobs] = useState([]);
-  // console.log(jobs)
+  console.log(jobs)
 
 
   useEffect(() => {
