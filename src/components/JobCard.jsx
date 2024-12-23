@@ -6,7 +6,6 @@ import { format } from "date-fns";
 const JobCard = ({ job }) => {
   const { title, category, min_price, max_price, description, bid_count, deadline } = job || {};
 
-  // Safely format the date, handle invalid or missing deadline
   let date = 'No Deadline';
   if (deadline) {
     try {

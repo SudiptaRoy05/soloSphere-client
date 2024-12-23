@@ -35,7 +35,6 @@ const AddJob = () => {
         photo: user?.photoURL,
       },
       title,
-      email,
       category,
       min_price,
       max_price,
