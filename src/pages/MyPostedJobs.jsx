@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { AuthContext } from '../providers/AuthProvider'
 import axios from 'axios';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const MyPostedJobs = () => {
   const { user } = useContext(AuthContext);
@@ -24,8 +25,17 @@ const MyPostedJobs = () => {
     }
   }, [user?.email])
 
-  const handleDelete=(id)=>{
-    console.log(id)
+  const handleDelete = (id) => {
+    try {
+      axios.delete(`${import.meta.env.VITE_API_URL}/job/${id}`);
+      toast.success('deleted data successfully');
+      const remainingJobs = jobs.filter((job) => job._id !== id);
+      setJobs(remainingJobs);
+
+    }
+    catch (err) {
+      toast.error('Somthing went wrong');
+    }
   }
 
 
@@ -99,7 +109,7 @@ const MyPostedJobs = () => {
 
                       <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
                         {
-                          job.deadline ? format(new Date(job.deadline), 'P') : 'No Deadline' 
+                          job.deadline ? format(new Date(job.deadline), 'P') : 'No Deadline'
 
                         }
                       </td>
@@ -121,7 +131,7 @@ const MyPostedJobs = () => {
                       </td>
                       <td className='px-4 py-4 text-sm whitespace-nowrap'>
                         <div className='flex items-center gap-x-6'>
-                          <button onClick={()=>handleDelete(job._id)} className='text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none'>
+                          <button onClick={() => handleDelete(job._id)} className='text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none'>
                             <svg
                               xmlns='http://www.w3.org/2000/svg'
                               fill='none'
