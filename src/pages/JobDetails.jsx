@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 import { compareAsc, format } from "date-fns";
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AuthContext } from '../providers/AuthProvider';
 import toast from 'react-hot-toast';
 
@@ -11,6 +11,7 @@ const JobDetails = () => {
   const [startDate, setStartDate] = useState(new Date())
   const [job, setJob] = useState({});
   const { id } = useParams()
+  const navigate = useNavigate();
 
   const { user } = useContext(AuthContext);
 
@@ -28,7 +29,7 @@ const JobDetails = () => {
   }
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target)
 
@@ -36,6 +37,7 @@ const JobDetails = () => {
     const comment = form.get('comment');
     const email = user?.email;
     const date = startDate;
+    const jobId = job._id;
 
     // bid Permission validation 
     if (user?.email === job?.buyer?.email) {
@@ -58,9 +60,19 @@ const JobDetails = () => {
     }
 
 
-    const bidData = { price, comment, email, date }
+    const bidData = { price, comment, email, date, jobId }
 
-    console.table(bidData)
+    try{
+      await axios.post(`${import.meta.env.VITE_API_URL}/add-bids`, bidData)
+      toast.success('Successfully bidded');
+      e.target.reset();
+      navigate('/my-bids');
+    }
+    catch(err){
+      console.log(err)
+      toast.error(err?.response?.data);
+    }
+
 
   }
 
