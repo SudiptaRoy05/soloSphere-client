@@ -1,17 +1,19 @@
-import axios from "axios";
+
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../providers/AuthProvider";
 import BidRequestTable from "./BidRequestTable";
 import toast from "react-hot-toast";
+import useSecureAxiox from "../hooks/useSecureAxiox";
 
 const BidRequests = () => {
+  const axiosSecure = useSecureAxiox()
   const [bidReq, setBidReq] = useState([]);
   const { user } = useContext(AuthContext);
 
   // Function to fetch bids
   const fetchMyBids = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/bids/${user?.email}?buyer=true`);
+      const { data } = await axiosSecure.get(`/bids/${user?.email}?buyer=true`);
       setBidReq(data);
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -31,7 +33,7 @@ const BidRequests = () => {
       return;
     }
     try {
-      const { data } = await axios.patch(`${import.meta.env.VITE_API_URL}/bid-status-update/${id}`, { status });
+      const { data } = await axiosSecure.patch(`/bid-status-update/${id}`, { status });
       console.log("Status updated:", data);
       toast.success(`Status Changed to ${status}`);
       // Refresh UI by re-fetching bids

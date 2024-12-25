@@ -12,6 +12,7 @@ import {
 } from 'firebase/auth'
 
 import app from '../firebase/firebase.config'
+import axios from 'axios'
 // import { app } from '../firebase/firebase.config'
 
 export const AuthContext = createContext(null)
@@ -51,11 +52,26 @@ const AuthProvider = ({ children }) => {
 
   // onAuthStateChange
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, currentUser => {
-      setUser(currentUser)
+    const unsubscribe = onAuthStateChanged(auth, async currentUser => {
       console.log('CurrentUser-->', currentUser)
+      if (currentUser?.email) {
+        setUser(currentUser)
+        // generateToken
+        const { data } = await axios.post(`${import.meta.env.
+          VITE_API_URL}/jwt`, { email: currentUser?.email }, { withCredentials: true })
+        console.log(data)
+      } else {
+
+        setUser(currentUser)
+        await axios.get(`${import.meta.env.
+          VITE_API_URL}/logout`, { withCredentials: true })
+
+      }
       setLoading(false)
+
     })
+
+
     return () => {
       return unsubscribe()
     }

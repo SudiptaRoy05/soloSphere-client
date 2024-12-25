@@ -2,15 +2,19 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../providers/AuthProvider";
 import BidTable from "./BidTable";
+import useSecureAxiox from "../hooks/useSecureAxiox";
+
+
 
 const MyBids = () => {
+  const axiosSecure = useSecureAxiox()
   const [bids, setBids] = useState([])
   const { user } = useContext(AuthContext);
 
 
   const fetchMyBids = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/bids/${user?.email}`);
+      const { data } = await axiosSecure.get(`/bids/${user?.email}`);
       setBids(data);
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -22,7 +26,7 @@ const MyBids = () => {
     if (user?.email) {
       fetchMyBids();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.email]);
 
   const handleStatusChange = async (id, prevStatus, status) => {

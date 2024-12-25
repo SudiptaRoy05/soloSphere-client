@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../providers/AuthProvider'
-import axios from 'axios';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import useSecureAxiox from '../hooks/useSecureAxiox';
 
 const MyPostedJobs = () => {
+  const axiosSecure = useSecureAxiox();
   const { user } = useContext(AuthContext);
   const [jobs, setJobs] = useState([]);
   console.log(jobs)
@@ -14,7 +15,7 @@ const MyPostedJobs = () => {
   useEffect(() => {
     const fetchMyJobs = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/${user?.email}`);
+        const { data } = await axiosSecure.get(`/jobs/${user?.email}`);
         setJobs(data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -23,11 +24,12 @@ const MyPostedJobs = () => {
     if (user?.email) {
       fetchMyJobs();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.email])
 
   const handleDelete = (id) => {
     try {
-      axios.delete(`${import.meta.env.VITE_API_URL}/job/${id}`);
+      axiosSecure.delete(`/job/${id}`);
       toast.success('deleted data successfully');
       const remainingJobs = jobs.filter((job) => job._id !== id);
       setJobs(remainingJobs);

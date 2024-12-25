@@ -3,17 +3,19 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import 'react-tabs/style/react-tabs.css'
 import JobCard from './JobCard'
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import useSecureAxiox from '../hooks/useSecureAxiox';
 
 const TabCategories = () => {
+  const axiosSecure = useSecureAxiox();
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
     fetchAll();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchAll = async () => {
-    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/jobs`);
+    const { data } = await axiosSecure.get(`/jobs`);
     setJobs(data)
   }
   return (
