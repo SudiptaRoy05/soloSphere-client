@@ -37,7 +37,11 @@ const JobDetails = () => {
     const comment = form.get('comment');
     const email = user?.email;
     const date = startDate;
-    const jobId = job._id;
+    const jobId = job?._id;
+    const title = job?.title;
+    const category = job?.category;
+    const status = "Pending";
+    const buyer = job?.buyer?.email;
 
     // bid Permission validation 
     if (user?.email === job?.buyer?.email) {
@@ -60,15 +64,15 @@ const JobDetails = () => {
     }
 
 
-    const bidData = { price, comment, email, date, jobId }
+    const bidData = { price, comment, email, date, jobId, title, category, status, buyer }
 
-    try{
+    try {
       await axios.post(`${import.meta.env.VITE_API_URL}/add-bids`, bidData)
       toast.success('Successfully bidded');
       e.target.reset();
       navigate('/my-bids');
     }
-    catch(err){
+    catch (err) {
       console.log(err)
       toast.error(err?.response?.data);
     }

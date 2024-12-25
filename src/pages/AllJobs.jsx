@@ -6,13 +6,23 @@ import axios from 'axios';
 const AllJobs = () => {
   const [jobs, setJobs] = useState([]);
 
-  useEffect(() => {
-    fetchAll();
-  }, [])
+  const [filter, setFilter] = useState('');
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('');
 
-  const fetchAll = async () => {
-    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/jobs`);
-    setJobs(data)
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/all-jobs?filter=${filter}&search=${search}&sort=${sort}`);
+      setJobs(data)
+    }
+    fetchAll();
+  }, [filter, search, sort])
+
+  const handleReset = () => {
+    setFilter('')
+    setSearch('')
+    setSort('')
   }
 
   return (
@@ -23,6 +33,8 @@ const AllJobs = () => {
             <select
               name='category'
               id='category'
+              onChange={(e) => setFilter(e.target.value)}
+              value={filter}
               className='border p-4 rounded-lg'
             >
               <option value=''>Filter By Category</option>
@@ -32,12 +44,14 @@ const AllJobs = () => {
             </select>
           </div>
 
-          <form>
+          <div>
             <div className='flex p-1 overflow-hidden border rounded-lg    focus-within:ring focus-within:ring-opacity-40 focus-within:border-blue-400 focus-within:ring-blue-300'>
               <input
+                onBlur={(e) => setSearch(e.target.value)}
                 className='px-6 py-2 text-gray-700 placeholder-gray-500 bg-white outline-none focus:placeholder-transparent'
                 type='text'
                 name='search'
+                defaultValue={search}
                 placeholder='Enter Job Title'
                 aria-label='Enter Job Title'
               />
@@ -46,19 +60,21 @@ const AllJobs = () => {
                 Search
               </button>
             </div>
-          </form>
+          </div>
           <div>
             <select
               name='category'
               id='category'
               className='border p-4 rounded-md'
+              onChange={(e) => setSort(e.target.value)}
+              value={sort}
             >
               <option value=''>Sort By Deadline</option>
               <option value='dsc'>Descending Order</option>
               <option value='asc'>Ascending Order</option>
             </select>
           </div>
-          <button className='btn'>Reset</button>
+          <button onClick={handleReset} className='btn'>Reset</button>
         </div>
         <div className='grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
           {
